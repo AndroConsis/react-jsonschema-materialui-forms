@@ -826,7 +826,7 @@ export function rangeSpec(schema) {
   return spec;
 }
 
-export function isValueFalsey(val) {
+export function isValueFalsy(val) {
   if (val == null || typeof val == "undefined") {
     // console.log(val, 'Satisfied val == null || typeof val == "undefined"');
     return true;
@@ -868,14 +868,14 @@ export function removeEmptyFieldsFromMap(obj) {
       val = val.trim();
     }
 
-    // console.log(key," --transformed but with falsey values-- ", val);
+    // console.log(key," --transformed but with falsy values-- ", val);
 
-    // Remove falsey values
-    if (isValueFalsey(val)) {
-      // Please note that 0 or -ve numbers are not considered falsey
+    // Remove falsy values
+    if (isValueFalsy(val)) {
+      // Please note that 0 or -ve numbers are not considered falsy
 
       delete obj[key];
-      // console.log("Deleting key ",key," with falsey value ", val, " from the object");
+      // console.log("Deleting key ",key," with falsy value ", val, " from the object");
     } else {
       // Update transformed values
       obj[key] = val;
@@ -885,7 +885,7 @@ export function removeEmptyFieldsFromMap(obj) {
 }
 
 export function removeEmptyFieldsFromArray(array) {
-  if (Array.isArray(array) && isValueFalsey(array)) {
+  if (Array.isArray(array) && isValueFalsy(array)) {
     return [];
   }
 
@@ -915,12 +915,12 @@ export function removeEmptyFieldsFromArray(array) {
     this[indexOfElement] = nextElement;
   }, array);
 
-  // console.log("array transformed but with falsey values--", array);
-  var nonFalseyValueArray = array.filter(function(nextElement) {
-    // Remove falsey values
-    return !isValueFalsey(nextElement);
+  // console.log("array transformed but with falsy values--", array);
+  var nonFalsyValueArray = array.filter(function(nextElement) {
+    // Remove falsy values
+    return !isValueFalsy(nextElement);
   });
 
-  // console.log("array transformed without any falsey values--", nonFalseyValueArray);
-  return nonFalseyValueArray;
+  // console.log("array transformed without any falsy values--", nonFalsyValueArray);
+  return nonFalsyValueArray;
 }
