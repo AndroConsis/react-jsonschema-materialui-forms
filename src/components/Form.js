@@ -10,7 +10,7 @@ import {
   setState,
   getDefaultRegistry,
   deepEquals,
-  removeEmptyFields,
+  removeEmptyFieldsFromMap,
 } from "../utils";
 import validateFormData, { toErrorList } from "../validate";
 
@@ -170,7 +170,7 @@ export default class Form extends Component {
       {
         errors: [],
         errorSchema: {},
-        formData: removeEmptyFields(this.state.formData),
+        formData: removeEmptyFieldsFromMap(this.state.formData),
       },
       () => {
         if (this.props.onSubmit) {

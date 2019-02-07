@@ -826,13 +826,101 @@ export function rangeSpec(schema) {
   return spec;
 }
 
-export function removeEmptyFields(obj) {
+export function isValueFalsey(val) {
+  if (val == null || typeof val == "undefined") {
+    // console.log(val, 'Satisfied val == null || typeof val == "undefined"');
+    return true;
+  }
+
+  if (val.constructor.name == "Array") {
+    // console.log(val, 'Satisfied val.constructor.name == "Array" condition evaluation for length:',(val.length === 0));
+    return val.length === 0;
+  }
+
+  if (val.constructor.name == "String") {
+    // console.log(val, 'Satisfied val.constructor.name == "String" condition evaluation for length:',(val.trim().length === 0));
+    return val.trim().length === 0;
+  }
+
+  if (val.constructor.name == "Object") {
+    // console.log(val, 'Satisfied val.constructor.name == "Object" condition evaluation:',(Object.entries(val).length));
+    return Object.entries(val).length === 0;
+  }
+}
+
+export function removeEmptyFieldsFromMap(obj) {
   Object.entries(obj).forEach(([key, val]) => {
-    if (val && typeof val === "object") {
-      removeEmptyFields(val);
-    } else if (val == null || typeof val == "undefined") {
+    // Cleanup object
+    if (val && typeof val === "object" && !Array.isArray(val)) {
+      val = removeEmptyFieldsFromMap(val);
+    }
+
+    // Cleanup array
+    if (Array.isArray(val) && val.length > 0) {
+      val = removeEmptyFieldsFromArray(val);
+    }
+
+    // Cleanup string
+    if (
+      !(val == null || typeof val == "undefined") &&
+      val.constructor.name == "String"
+    ) {
+      val = val.trim();
+    }
+
+    // console.log(key," --transformed but with falsey values-- ", val);
+
+    // Remove falsey values
+    if (isValueFalsey(val)) {
+      // Please note that 0 or -ve numbers are not considered falsey
+
       delete obj[key];
+      // console.log("Deleting key ",key," with falsey value ", val, " from the object");
+    } else {
+      // Update transformed values
+      obj[key] = val;
     }
   });
   return obj;
+}
+
+export function removeEmptyFieldsFromArray(array) {
+  if (Array.isArray(array) && isValueFalsey(array)) {
+    return [];
+  }
+
+  array.forEach(function(nextElement, indexOfElement) {
+    // Cleanup object
+    if (
+      nextElement &&
+      typeof nextElement === "object" &&
+      !Array.isArray(nextElement)
+    ) {
+      nextElement = removeEmptyFieldsFromMap(nextElement);
+    }
+
+    // Cleanup array
+    if (Array.isArray(nextElement) && nextElement.length > 0) {
+      nextElement = removeEmptyFieldsFromArray(nextElement);
+    }
+
+    // Cleanup string
+    if (
+      !(nextElement == null || typeof nextElement == "undefined") &&
+      nextElement.constructor.name == "String"
+    ) {
+      nextElement = nextElement.trim();
+    }
+
+    this[indexOfElement] = nextElement;
+  }, array);
+
+  // console.log("array transformed but with falsey values--", array);
+  var nonFalseyValueArray = array.filter(function(nextElement) {
+    // Remove falsey values
+    return !isValueFalsey(nextElement);
+  });
+
+  // console.log("array transformed without any falsey values--", nonFalseyValueArray);
+  return nonFalseyValueArray;
 }
